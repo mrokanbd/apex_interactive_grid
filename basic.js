@@ -48,3 +48,21 @@ apex.region("purchase_req_dtl_dtl").widget().css('pointer-events', 'none');
 var igModel = apex.region("purchase_req_dtl_dtl").widget().interactiveGrid("getViews", "grid").model;
 
 
+
+
+// ************************** meta data relate (Record, Column) ************************
+Oracle APEX maps column names (aliases) to internal keys, and using this method ensures your code will not break if you rearrange or add columns in Page Designer.Here is the updated, clean way to write your code:javascriptconst model = apex.region('purchase_req_dtl_dtl').call('getCurrentView').model;
+const columnKey = model.getFieldKey('COLUMN_NAME'); // Replace with your actual SQL column alias
+
+const allPurcharDtlRequiredRowFill = model._data.every(item => item[columnKey]);
+Use code with caution.💡 The Recommended APEX API ApproachDirectly accessing _data works, but it utilizes an undocumented, private internal property (_data) that Oracle could change in a future APEX upgrade.The officially supported, safest way to loop through the grid records using column names is by using model.forEach:javascriptconst model = apex.region('purchase_req_dtl_dtl').call('getCurrentView').model;
+let allPurcharDtlRequiredRowFill = true;
+
+model.forEach(function(record) {
+    // Replace 'COLUMN_NAME' with your exact column alias (case-sensitive)
+    const value = model.getValue(record, 'COLUMN_NAME'); 
+    
+    if (!value) {
+        allPurcharDtlRequiredRowFill = false;
+    }
+});
